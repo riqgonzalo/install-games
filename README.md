@@ -57,7 +57,7 @@ Además **nunca instala Steam ni plataformas para ejecutar juegos de Windows** (
 ## Instalación
 
 ```bash
-git clone https://github.com/riqgonzalo-lgtm/install-games.git
+git clone https://github.com/riqgonzalo/install-games.git
 cd install-games
 ./install.sh
 ```
