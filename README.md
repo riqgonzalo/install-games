@@ -49,7 +49,7 @@ Además **nunca instala Steam ni plataformas para ejecutar juegos de Windows** (
 | Fedora (probado en Fedora 44, KDE) | Usa `dnf` (compatible con dnf4 y dnf5) y `rpm`. |
 | Python 3 | Viene con Fedora. |
 | Privilegios de administrador | El script se relanza solo con `sudo` o `pkexec` si hace falta. |
-| `konsole` | Solo para el lanzador `.desktop`. El script funciona en cualquier terminal. |
+| Cualquier escritorio | El lanzador `.desktop` usa la terminal predeterminada (Konsole, GNOME Console…). |
 | Conexión a Internet | Para descargar catálogos y juegos. |
 
 `flatpak` y `snapd` se instalan automáticamente si faltan (snapd solo si no usas `--no-snap` / `--no-snapd-install`).
@@ -98,7 +98,7 @@ python3 install_games.py [opciones]
 | Solo quitar juegos duplicados | `sudo python3 install_games.py --solo-limpiar` |
 | Instalar sin usar Snap | `sudo python3 install_games.py --no-snap` |
 
-Todas se abren en `konsole --hold`, de modo que la ventana no se cierra al terminar y puedes leer el resumen.
+Todas se abren en la terminal de tu escritorio (`Terminal=true`). Al terminar, el script espera a que pulses Enter para que puedas leer el resumen.
 
 ---
 
@@ -186,7 +186,7 @@ Dos juegos se consideran el mismo si **comparten al menos una clave**.
 
 `is_blocked()` descarta un elemento si cumple cualquiera de estas reglas:
 
-- **Prefijo de ID** conocido: `com.valvesoftware.`, `org.winehq.`, `com.usebottles.`, `net.lutris.`, `com.heroicgameslauncher.`, `com.playonlinux.`, `org.phoenicis.`, `io.github.faugus.`, ProtonUp-Qt, ProtonPlus, Protontricks, Minigalaxy, GameHub, Rare, Legendary, Steam ROM Manager, BoilR, Vinegar…
+- **Prefijo de ID** conocido: `com.valvesoftware.`, `org.winehq.`, `com.usebottles.`, `net.lutris.`, `com.heroicgameslauncher.`, `com.playonlinux.`, `org.phoenicis.`, `io.github.faugus.`, ProtonUp-Qt, ProtonPlus, Protontricks, Minigalaxy, GameHub, Rare, Legendary, Steam ROM Manager, BoilR, Vinegar, PortProton, XIVLauncher, los lanzadores `moe.launcher.*` (Anime Game, Honkers, Sleepy), Twintail, Nexus LU Launcher, AdwSteamGtk…
 - **Segmento exacto** del ID o nombre de paquete (separado por `.`, `-`, `_`…): `steam`, `wine`, `winetricks`, `proton`, `lutris`, `bottles`, `heroic`, `crossover`, `dxvk`, `vkd3d`, `umu`, etc.
 - **Expresión regular** sobre el nombre visible: `Steam`, `Wine…`, `Lutris`, `Bottles`, `PlayOnLinux`, `Heroic Games`, `Proton…`, `CrossOver`…
 
@@ -206,7 +206,7 @@ Todo lo que se muestra en pantalla se guarda también (sin códigos de color) en
 ```
 install-games/
 ├── install_games.py          # El script principal
-├── install_games.desktop.in  # Plantilla del lanzador de KDE (@SCRIPT_PATH@ se sustituye al instalar)
+├── install_games.desktop.in  # Plantilla del lanzador (@SCRIPT_PATH@ se sustituye al instalar)
 ├── install.sh                # Instala script + lanzador en ~/.local/share
 ├── uninstall.sh              # Quita script + lanzador
 ├── LICENSE                   # MIT
@@ -219,7 +219,8 @@ install-games/
 - **Comparación por nombre:** la detección de duplicados es heurística. Dos juegos distintos con nombres muy parecidos podrían tratarse como el mismo, y un mismo juego con nombres muy distintos en cada formato podría no detectarse.
 - Las claves de Flatpak incluyen **todas** las apps Flatpak instaladas (no solo juegos), lo que puede producir algún falso positivo raro.
 - Pensado para Fedora: depende de `dnf`, `rpm` y de las rutas de Flatpak/Snap en Fedora.
-- El lanzador usa `konsole`; en otros escritorios cambia `konsole --hold -e` por tu terminal en `install_games.desktop.in`.
+- **Sistemas inmutables** (Fedora Silverblue, Kinoite, Bazzite…): se detectan solos y se usa **solo Flatpak**, porque DNF y Snap no están disponibles. Probado en Fedora Kinoite 44 con `--dry-run`: 746 juegos Flatpak, sin errores.
+- Para comprobar qué se bloquea, ejecuta `--dry-run`: el recuento «excluidos Steam/Windows» muestra cuántas apps se descartan.
 
 ## Licencia
 

@@ -108,6 +108,13 @@ BLOCKED_ID_PREFIXES = (
     "com.steamgriddb.",              # Steam ROM Manager
     "io.github.philipk.boilr",       # BoilR (Steam)
     "org.vinegarhq.vinegar",         # Vinegar (Roblox Studio con Wine)
+    "ru.linux_gaming.portproton",    # PortProton (Wine/Proton)
+    "dev.goats.xivlauncher",         # XIVLauncher (FFXIV con Wine)
+    "cn.ottercorp.xivlaunchercn",    # XIVLauncher CN
+    "moe.launcher.",                 # Anime Game / Honkers / Sleepy Launcher (Wine)
+    "app.twintaillauncher.",         # Twintail Launcher (Wine/Proton)
+    "io.thenexusavenger.nexus-lu-launcher",  # LEGO Universe con Wine
+    "io.github.foldex.adwsteamgtk",  # Tema para Steam
 )
 # Segmentos exactos de un ID / nombre de paquete
 BLOCKED_TOKENS = {
@@ -119,12 +126,13 @@ BLOCKED_TOKENS = {
     "proton", "protonup", "protonupqt", "pupgui2", "protontricks", "protonplus",
     "minigalaxy", "gamehub", "crossover", "cxoffice", "boxtron", "luxtorpeda",
     "dxvk", "vkd3d", "umu", "umulauncher", "boilr",
+    "portproton", "xivlauncher", "xivlaunchercn", "adwsteamgtk",
 }
 # Expresiones sobre el nombre visible
 BLOCKED_NAME_RE = re.compile(
     r"\bsteam\b|\bwine(hq|tricks|zgui|charm)?\b|\bq4wine\b|\blutris\b|\bbottles\b|"
     r"\bplay ?on ?linux\b|\bfaugus\b|\bheroic games\b|\bproton ?(up|plus|tricks|ge)?\b|"
-    r"\bminigalaxy\b|\bgamehub\b|\bcrossover\b",
+    r"\bminigalaxy\b|\bgamehub\b|\bcrossover\b|\bportproton\b|\bxivlauncher\b",
     re.IGNORECASE,
 )
 
@@ -536,6 +544,7 @@ def main():
 
     ensure_root(argv)
     user, home = real_user_info()
+    immutable = os.path.exists("/run/ostree-booted")
     if home and not args.dry_run:
         LOG_PATH = os.path.join(home, "install_games.log")
         try:
@@ -550,6 +559,11 @@ def main():
     header()
     if args.dry_run:
         log("[MODO SIMULACIÓN] No se realizarán cambios.\n", "y")
+
+    if immutable and not (args.no_dnf and args.no_snap):
+        log("[i] Sistema inmutable (rpm-ostree: Silverblue, Kinoite, Bazzite...): "
+            "solo se usará Flatpak; DNF y Snap no están disponibles.", "y")
+        args.no_dnf = args.no_snap = True
 
     # ---------- 1. Preparación ----------
     if not flatpak_prepare(args.dry_run):
@@ -707,11 +721,18 @@ def main():
 
     # ---------- 7. Resumen ----------
     log("\n" + "=" * 64, "c")
-    log("RESUMEN", "b")
-    log(f"  Flatpak instalados : {len(fp_ok)}   fallidos: {len(fp_fail)}")
-    log(f"  DNF instalados     : {len(dnf_ok)}   fallidos: {len(dnf_fail)}")
-    log(f"  Snap instalados    : {len(snap_ok)}   fallidos: {len(snap_fail)}")
-    log(f"  Duplicados quitados: {len(remove_rpm) + len(remove_snap)}")
+    if args.dry_run:
+        log("RESUMEN (SIMULACIÓN: no se ha cambiado nada)", "b")
+        log(f"  Flatpak que se instalarían : {len(fp_ok)}")
+        log(f"  DNF que se instalarían     : {len(dnf_ok)}")
+        log(f"  Snap que se instalarían    : {len(snap_ok)}")
+        log(f"  Duplicados que se quitarían: {len(remove_rpm) + len(remove_snap)}")
+    else:
+        log("RESUMEN", "b")
+        log(f"  Flatpak instalados : {len(fp_ok)}   fallidos: {len(fp_fail)}")
+        log(f"  DNF instalados     : {len(dnf_ok)}   fallidos: {len(dnf_fail)}")
+        log(f"  Snap instalados    : {len(snap_ok)}   fallidos: {len(snap_fail)}")
+        log(f"  Duplicados quitados: {len(remove_rpm) + len(remove_snap)}")
     for f in fp_fail + dnf_fail + snap_fail:
         log(f"   ✖ {f}", "r")
     if LOG_PATH:

@@ -3,20 +3,20 @@ Version=1.0
 Type=Application
 Name=Instalar Juegos
 Comment=Instala juegos sin duplicados (Flatpak > DNF > Snap). Sin Steam ni plataformas para juegos de Windows.
-Exec=konsole --hold -e sudo python3 @SCRIPT_PATH@
+Exec=sudo python3 @SCRIPT_PATH@
 Icon=input-gaming
-Terminal=false
-Categories=System;Utility;
+Terminal=true
+Categories=Game;
 Actions=Simular;Limpiar;SinSnap;
 
 [Desktop Action Simular]
 Name=Simular (no cambia nada)
-Exec=konsole --hold -e python3 @SCRIPT_PATH@ --dry-run
+Exec=python3 @SCRIPT_PATH@ --dry-run
 
 [Desktop Action Limpiar]
 Name=Solo quitar juegos duplicados
-Exec=konsole --hold -e sudo python3 @SCRIPT_PATH@ --solo-limpiar
+Exec=sudo python3 @SCRIPT_PATH@ --solo-limpiar
 
 [Desktop Action SinSnap]
 Name=Instalar sin usar Snap
-Exec=konsole --hold -e sudo python3 @SCRIPT_PATH@ --no-snap
+Exec=sudo python3 @SCRIPT_PATH@ --no-snap
